@@ -1,0 +1,63 @@
+%implements "chartSource" "C"
+%function ChartConfig(block, system) void
+  %createrecord chartConfiguration { ...
+          executeAtInitialization  0 ...
+  }
+  %return chartConfiguration
+%endfunction
+%function ChartDataMap(block, system) void
+  %createrecord ChartDataElements {\
+    NumChartData   6 \
+    ChartDataDefaults {\
+      RecordType   "ChartData"\
+      Dimensions   []\
+      IsTestPoint  0\
+    }\
+    ChartData {\
+      Name         "frame"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "ARDroneHover:2187:11:257-262"\
+      Dimensions   [496]\
+    }\
+    ChartData {\
+      Name         "lastFrame"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "ARDroneHover:2187:11:276-285"\
+      Dimensions   [496]\
+    }\
+    ChartData {\
+      Name         "count"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "ARDroneHover:2187:11:299-304"\
+    }\
+    ChartData {\
+      Name         "countHeader"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "ARDroneHover:2187:11:318-329"\
+    }\
+    ChartData {\
+      Name         "countBuffer"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "ARDroneHover:2187:11:343-354"\
+    }\
+    ChartData {\
+      Name         "buffer"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "ARDroneHover:2187:11:368-374"\
+      Dimensions   [1024]\
+    }\
+  }
+  %return ChartDataElements
+%endfunction
