@@ -6,7 +6,8 @@ xlabel('Tempo (s)')
 hold on
 
 %generate a step vector
+
 plot(stepSimout.time,stepSimout.signals.values)
 
 hold off
-legend('Resposta em Simulação', 'Referência','location', 'southeast')
+legend('Simulação')
