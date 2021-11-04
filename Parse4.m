@@ -1,5 +1,4 @@
-i=1;
-
+fitAmplitudes = zeros(5,3);
 for i=1:5
     if i==1
         load 41_1rad.mat
@@ -32,13 +31,25 @@ for i=1:5
         start = round(targetStart/sampleTime);
         finish = round(targetFinish/sampleTime);
     end
-    
-    figure (i)
+    %figures with response and pitch ref
+    figure(i)
     plot(time(start:finish), states.signals.values(start:finish,2))
     title('Pitch')
     ylabel('theta(rad)')
     xlabel('Tempo(s)')
-    hold on
+    hold on 
+    plot(pitchref.time(start:finish), pitchref.signals.values(start:finish,1))      
+    legend('Resposta da Pitch','Referencia de Pitch','location', 'southeast')
     hold off
-    legend('Resposta da Pitch','location', 'southeast')   
+    %figures with sinewave fitting of the response signal
+    figure(i+10)
+    fiti = fit(time(start:finish),states.signals.values(start:finish,2),'sin1');
+    fitBox{i} = fiti;
+    fitAmplitudes(i,:) = coeffvalues(fiti); 
+    plot(fiti,time(start:finish),states.signals.values(start:finish,2))
+    title('Pitch')
+    ylabel('theta(rad)')
+    xlabel('Tempo(s)')
+    legend('Resposta da Pitch','Interpolação de seno','location', 'southeast')
+       
 end
