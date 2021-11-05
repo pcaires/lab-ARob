@@ -1,4 +1,5 @@
 fitAmplitudes = zeros(5,3);
+fitBox = cell(1,4);
 for i=1:5
     if i==1
         load 41_1rad.mat
