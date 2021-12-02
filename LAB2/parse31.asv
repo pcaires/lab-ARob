@@ -1,0 +1,7 @@
+load sensorsA.mat
+dT = sensors.signal1.time(2)-sensors.signal1.time(1);
+endTime = 30; %seconds
+
+startPlot=1;
+endPlot = endTime;
+plot(sensors.signal1.time(startPlot:endPlot),sensors.signal1.data(startPlot:endPlot,:))
