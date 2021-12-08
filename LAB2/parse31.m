@@ -1,5 +1,5 @@
 %Editar o ficheiro mat a carregar.
-load sensorsD.mat
+load sensorsBC.mat
 %-------------------------------------------------
 dT = sensors.signal1.time(2)-sensors.signal1.time(1);
 endTime = 30; %seconds
@@ -8,7 +8,6 @@ startPlot = round(startTime/dT);
 endPlot = round(endTime/dT);
 
 treatedTimeSeries = [sensors.signal1.time(startPlot:endPlot) sensors.signal1.data(startPlot:endPlot,:) sensors.signal2.data(startPlot:endPlot,:)  ]; 
-
 %Plot block
 figure(31)
 plot( treatedTimeSeries(:,1), treatedTimeSeries(: , 5:7) );
@@ -37,8 +36,9 @@ disp(CovarianceData1);
 
 %pitch and roll from inclinometer data
 g = 981;%cm/s^2
-theta  =  (asin((treatedTimeSeries(:, 2))/-g));%pitch
+theta  =  (asin((treatedTimeSeries(:, 2))/g));%pitch
 phi = (asin((treatedTimeSeries(:, 3))./(-g*cos(theta))));%roll
+phi = (atan( treatedTimeSeries(:, 3)./treatedTimeSeries(:, 4)) );
 %Plot block para 3.4
 figure(33)
 plot (treatedTimeSeries(:, 1), rad2deg(theta), treatedTimeSeries(:, 1), rad2deg(phi))
