@@ -1,8 +1,8 @@
 %Editar o ficheiro mat a carregar.
-load sensorsBC.mat
+load sensorsB.mat
 %-------------------------------------------------
 dT = sensors.signal1.time(2)-sensors.signal1.time(1);
-endTime = 30; %seconds
+endTime = 25; %seconds
 startTime = 0.1; %seconds
 startPlot = round(startTime/dT);
 endPlot = round(endTime/dT);
@@ -44,3 +44,18 @@ figure(33)
 plot (treatedTimeSeries(:, 1), rad2deg(theta), treatedTimeSeries(:, 1), rad2deg(phi))
 legend('raw pitch (deg)','raw roll (deg)') 
 %end plot block
+A=0;
+B=1;
+C=1;
+D=0;
+Plant = ss(A,B,C,D,-1);
+Plant.InputName = 'un';
+Plant.OutputName = 'yt';
+Sum = sumblk('un = u + w');
+sys = connect(Plant,Sum,{'u','w'},'yt');
+
+Q = 0.1;
+R = 0.1;
+N = 0;
+
+[Kfilter,L,P] = kalman(sys,Q,R,N);
