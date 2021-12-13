@@ -1,6 +1,6 @@
 %Editar o ficheiro mat a carregar.
-%clear
-load sensorsD.mat
+clear
+load sensorsC.mat
 %-------------------------------------------------
 dT = sensors.signal1.time(2)-sensors.signal1.time(1);
 endTime = 25; %seconds
@@ -68,7 +68,7 @@ kalmfpitch = kalmfpitch(1,:);
 %ROLL
 Qroll = CovarianceData1(2,2);
 Rroll = CovarianceData1(4,4);
-Qroll = 0.0017;
+Qroll = 0.008;
 Rroll = 0.0017;
 N = 0;
 
@@ -76,8 +76,3 @@ N = 0;
 GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
 kalmfroll = kalmfroll(1,:);
-
-figure(4)
-plot(out.theta)
-figure(5)
-plot(out.phi)
