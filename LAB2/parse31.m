@@ -1,5 +1,4 @@
 %Editar o ficheiro mat a carregar.
-clear fg
 clear
 load sensorsB.mat
 %-------------------------------------------------
