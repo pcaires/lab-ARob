@@ -1,6 +1,7 @@
 %Editar o ficheiro mat a carregar.
-%clear
-load sensorsD.mat
+clear fg
+clear
+load sensorsB.mat
 %-------------------------------------------------
 dT = sensors.signal1.time(2)-sensors.signal1.time(1);
 endTime = 25; %seconds
@@ -66,7 +67,7 @@ Qpitch = CovarianceData1(1,1);
 Rpitch = CovarianceData1(5,5);
 
 Qpitch=0.0142;
-Rpitch=0.5*Qpitch;
+Rpitch=2*Qpitch;
 N = 0;
 
 [kalmfpitch,Lpitch,~,Mxpitch,Zpitch]= kalman(sys,Qpitch,Rpitch,N);
