@@ -70,36 +70,29 @@ sys = ss(A, [B G], C, [D H]);
 
 QpitchPitch = 0.0093; %retirado da experiencia C
 Qpitch = [QpitchPitch 0;
-          0 20*QpitchPitch];
-
+          0 0.2*QpitchPitch];
 Rpitch=20*QpitchPitch;
-
 [kalmfpitch,Lpitch,Ppitch]= kalman(sys,Qpitch,Rpitch);
-kalmfpitch = kalmfpitch(1,:);
-sizeData = size(treatedTimeSeries(:,6),1);
-GyrosESTpitch= timeseries ([zeros(sizeData,1) treatedTimeSeries(:,6)*3.14/180], treatedTimeSeries(:,1));
+
+GyrosESTpitch= timeseries (treatedTimeSeries(:,6)*3.14/180, treatedTimeSeries(:,1));
 Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 
 
 %ROLL
 QrollRoll = 0.0073; %retirado da experiencia C
 Qroll = [QrollRoll 0;
-         0 20*QrollRoll];
+         0 0.2*QrollRoll];
     
 %Qroll = 0.0750;
 Rroll = 20*QrollRoll;
-
-
 [kalmfroll,Lroll,Proll]= kalman(sys,Qroll,Rroll);
 
-sizeData2 = size(treatedTimeSeries(:,5),1);
 
-GyrosESTroll= timeseries ([zeros(sizeData2,1) treatedTimeSeries(:,5)*3.14/180], treatedTimeSeries(:,1));
+GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
-
 
 Qconst = 0.01;
 Qtest = [Qconst 0; 
-         0   Qconst];
-Rtest = Qconst;
+         0   0.2*Qconst];
+Rtest = 2*Qconst;
 [kalmftest,Ltest,Ptest]= kalman(sys,Qtest,Rtest);

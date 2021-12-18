@@ -1,6 +1,6 @@
 %Editar o ficheiro mat a carregar.
 clear
-load sensorsC.mat
+load sensorsD.mat
 %-------------------------------------------------
 dT = sensors.signal1.time(2)-sensors.signal1.time(1);
 endTime = 25; %seconds
@@ -41,7 +41,7 @@ disp(CovarianceData1);
 g = 9.81;%m/s^2
 thetaRaw  = [treatedTimeSeries(:,1)  asin((treatedTimeSeries(:, 2))./g)];%pitch
 %phiRaw = (asin((treatedTimeSeries(:, 3))./(-g*cos(thetaRaw))));%roll
-phiRaw = [treatedTimeSeries(:,1) atan(treatedTimeSeries(:, 3)./treatedTimeSeries(:, 4))] ;
+phiRaw = [treatedTimeSeries(:,1) (atan(treatedTimeSeries(:, 3)+0.6979)./treatedTimeSeries(:, 4))]
 
 %Plot block para 3.4
 figure(33)
@@ -70,8 +70,6 @@ Rpitch=2*Qpitch;
 N = 0;
 
 [kalmfpitch,Lpitch,P]= kalman(sys,Qpitch,Rpitch,N);
-kalmfpitch = kalmfpitch(1,:);
-
 GyrosESTpitch= timeseries (treatedTimeSeries(:,6)*3.14/180, treatedTimeSeries(:,1));
 Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 
@@ -80,12 +78,10 @@ Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 %Qroll = CovarianceData1(2,2);
 %Rroll = CovarianceData1(4,4);
 Qroll = 0.0093;
-Rroll = 5*Qroll;
+Rroll = 2*Qroll;
 N = 0;
 
 [kalmfroll,Lroll,P]= kalman(sys,Qroll,Rroll,N);
-%kalmfroll = kalmfroll(1,:);
-
 GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
 
