@@ -1,6 +1,6 @@
 %Editar o ficheiro mat a carregar.
 clear
-load sensorsB.mat
+load sensorsD.mat
 %-------------------------------------------------
 dT = sensors.signal1.time(2)-sensors.signal1.time(1);
 endTime = 25; %seconds
@@ -30,8 +30,7 @@ ylabel('m/s^2')
 %Mean of time series
 MeanData1 = mean( treatedTimeSeries(:,2:7) );
 CovarianceData1 = cov( treatedTimeSeries(:,2:7) );
-disp(CovarianceData1);
-
+%disp(CovarianceData1);
 %COV([A B C]) = [COV(A,A) COV(A,B) COV(A,C)]
 %               [COV(B,A) COV(B,B) COV(B,C)]
 %               [COV(C,A) COV(C,B) COV(C,C)]
@@ -40,8 +39,8 @@ disp(CovarianceData1);
 %pitch and roll from inclinometer data
 g = 9.81;%m/s^2
 thetaRaw  = [treatedTimeSeries(:,1)  asin((treatedTimeSeries(:, 2))./g)];%pitch
-%phiRaw = (asin((treatedTimeSeries(:, 3))./(-g*cos(thetaRaw))));%roll
-phiRaw = [treatedTimeSeries(:,1) atan(treatedTimeSeries(:, 3)./treatedTimeSeries(:, 4))] ;
+%phiRaw = [treatedTimeSeries(:,1) asin((treatedTimeSeries(:, 3))./(-g*cos(thetaRaw(:,2))))];%roll
+phiRaw = [treatedTimeSeries(:,1) (atan(treatedTimeSeries(:, 3)+0.6979)./treatedTimeSeries(:, 4))] ;
 
 %Plot block para 3.4
 figure(33)
@@ -50,41 +49,49 @@ legend('raw pitch (deg)','raw roll (deg)')
 %end plot block
 
 %KALMAN
-
-
 %State-space
-A=0;
-B=1;
-C=1;
-D=0;
-%Ts = dT;
-sys = ss(A, B, C, D);
+A=[-1 0; 0 0];
+B=[0;1];
+
+C=[0 1];
+
+D= [0 0 0];
+
+sys = ss(A, [B eye(2)], C, D);
 
 %Q -> inverso da credibilidade no giroscopio, R-> inverso da credibilidade no accelerómetro
 %PITCH
-Qpitch = CovarianceData1(1,1);
-Rpitch = CovarianceData1(5,5);
+%Qpitch = CovarianceData1(1,1);
 
-Qpitch=0.0142;
-Rpitch=2*Qpitch;
-N = 0;
+QpitchPitch = 0.0093; %retirado da experiencia C
+Qpitch = [QpitchPitch 0;
+          0 20*QpitchPitch];
 
-[kalmfpitch,Lpitch,~,Mxpitch,Zpitch]= kalman(sys,Qpitch,Rpitch,N);
+Rpitch=20*QpitchPitch;
+
+[kalmfpitch,Lpitch,Ppitch]= kalman(sys,Qpitch,Rpitch);
 kalmfpitch = kalmfpitch(1,:);
-
-GyrosESTpitch= timeseries (treatedTimeSeries(:,6)*3.14/180, treatedTimeSeries(:,1));
+sizeData = size(treatedTimeSeries(:,6),1);
+GyrosESTpitch= timeseries ([zeros(sizeData,1) treatedTimeSeries(:,6)*3.14/180], treatedTimeSeries(:,1));
 Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 
 
 %ROLL
-Qroll = CovarianceData1(2,2);
-Rroll = CovarianceData1(4,4);
-Qroll = 0.0750;
-Rroll = 2*Qroll;
-N = 0;
+QrollRoll = 0.0073; %retirado da experiencia C
+Qroll = [QrollRoll 0;
+         0 20*QrollRoll];
+    
+%Qroll = 0.0750;
+Rroll = 20*QrollRoll;
 
-[kalmfroll,Lroll,~,Mxroll,Zroll]= kalman(sys,Qroll,Rroll,N);
+
+[kalmfroll,Lroll,Proll]= kalman(sys,Qroll,Rroll);
 kalmfroll = kalmfroll(1,:);
+sizeData2 = size(treatedTimeSeries(:,5),1);
 
-GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
+GyrosESTroll= timeseries ([zeros(sizeData2,1) treatedTimeSeries(:,5)*3.14/180], treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
+Qconst = 2;
+QTest = [Qconst 0; 
+         0 200*Qconst];
+RTest = 0.1*Qconst;

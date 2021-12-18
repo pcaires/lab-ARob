@@ -1,6 +1,6 @@
 %Editar o ficheiro mat a carregar.
-%clear
-load sensorsD.mat
+clear
+load sensorsC.mat
 %-------------------------------------------------
 dT = sensors.signal1.time(2)-sensors.signal1.time(1);
 endTime = 25; %seconds
@@ -60,16 +60,16 @@ D=0;
 %Ts = dT;
 sys = ss(A, B, C, D);
 
-%Q -> credibilidade no g
+%Q -> inverso da credibilidade no giroscopio, R-> inverso da credibilidade no accelerómetro
 %PITCH
-Qpitch = CovarianceData1(1,1);
-Rpitch = CovarianceData1(5,5);
+%Qpitch = CovarianceData1(1,1);
+%Rpitch = CovarianceData1(5,5);
 
-Qpitch=0.008;
-Rpitch=0.0017;
+Qpitch=0.0073;
+Rpitch=2*Qpitch;
 N = 0;
 
-[kalmfpitch,Lpitch,~,Mxpitch,Zpitch]= kalman(sys,Qpitch,Rpitch,N);
+[kalmfpitch,Lpitch,P]= kalman(sys,Qpitch,Rpitch,N);
 kalmfpitch = kalmfpitch(1,:);
 
 GyrosESTpitch= timeseries (treatedTimeSeries(:,6)*3.14/180, treatedTimeSeries(:,1));
@@ -77,20 +77,14 @@ Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 
 
 %ROLL
-Qroll = CovarianceData1(2,2);
-Rroll = CovarianceData1(4,4);
-Qroll = 0.0017;
-Rroll = 0.0017;
+%Qroll = CovarianceData1(2,2);
+%Rroll = CovarianceData1(4,4);
+Qroll = 0.0093;
+Rroll = 5*Qroll;
 N = 0;
 
-[kalmfroll,Lroll,~,Mxroll,Zroll]= kalman(sys,Qroll,Rroll,N);
+[kalmfroll,Lroll,P]= kalman(sys,Qroll,Rroll,N);
 kalmfroll = kalmfroll(1,:);
 
 GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
-
-%plot out estimations
-figure(4)
-plot(out.theta)
-figure(5)
-%plot(out.phi)
