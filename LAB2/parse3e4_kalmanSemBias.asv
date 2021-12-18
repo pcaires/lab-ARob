@@ -58,7 +58,7 @@ B=1;
 C=1;
 D=0;
 %Ts = dT;
-sys = ss(A, [B 1], C, [D 0]);
+sys = ss(A, B, C, D);
 
 %Q -> inverso da credibilidade no giroscopio, R-> inverso da credibilidade no accelerómetro
 %PITCH
@@ -84,13 +84,9 @@ Rroll = 5*Qroll;
 N = 0;
 
 [kalmfroll,Lroll,P]= kalman(sys,Qroll,Rroll,N);
-%kalmfroll = kalmfroll(1,:);
+kalmfroll = kalmfroll(1,:);
 
 GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
 
-Qconst = 0.01;
-Qtest = Qconst;
-Rtest = Qconst;
-[kalmftest,Ltest,Ptest] = kalman(sys,Qtest,Rtest);
 

@@ -50,14 +50,19 @@ legend('raw pitch (deg)','raw roll (deg)')
 
 %KALMAN
 %State-space
-A=[-1 0; 0 0];
-B=[0;1];
+A=[0 -1
+   0 0];
+B=[1
+   0];
+C=[1 0];
 
-C=[0 1];
+D=[0];
 
-D= [0 0 0];
+H=[0 0];
 
-sys = ss(A, [B eye(2)], C, D);
+G=eye(2);
+
+sys = ss(A, [B G], C, [D H]);
 
 %Q -> inverso da credibilidade no giroscopio, R-> inverso da credibilidade no accelerómetro
 %PITCH
@@ -86,12 +91,15 @@ Rroll = 20*QrollRoll;
 
 
 [kalmfroll,Lroll,Proll]= kalman(sys,Qroll,Rroll);
-kalmfroll = kalmfroll(1,:);
+
 sizeData2 = size(treatedTimeSeries(:,5),1);
 
 GyrosESTroll= timeseries ([zeros(sizeData2,1) treatedTimeSeries(:,5)*3.14/180], treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
-Qconst = 2;
-QTest = [Qconst 0; 
-         0 200*Qconst];
-RTest = 0.1*Qconst;
+
+
+Qconst = 0.01;
+Qtest = [Qconst 0; 
+         0   Qconst];
+Rtest = Qconst;
+[kalmftest,Ltest,Ptest]= kalman(sys,Qtest,Rtest);
