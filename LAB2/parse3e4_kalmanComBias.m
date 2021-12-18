@@ -12,7 +12,7 @@ treatedTimeSeries = [sensors.signal1.time(startPlot:endPlot) sensors.signal1.dat
 treatedTimeSeries(:,2:4) = treatedTimeSeries(:,2:4)/100; % conversão das acelerações para m/s^2 
 %Plot block
 figure(31)
-plot( treatedTimeSeries(:,1), treatedTimeSeries(: , 5:7) );
+plot( treatedTimeSeries(:,1), deg2rad(treatedTimeSeries(: , 5:7) ));
 legend('\omega_x','\omega_y','\omega_z') 
 title('Dados dos giroscópios')
 xlabel('tempo(s)')
@@ -38,7 +38,7 @@ CovarianceData1 = cov( treatedTimeSeries(:,2:7) );
 
 %pitch and roll from inclinometer data
 g = 9.81;%m/s^2
-thetaRaw  = [treatedTimeSeries(:,1)  asin((treatedTimeSeries(:, 2))./g)];%pitch
+thetaRaw  = [treatedTimeSeries(:,1)  asin((treatedTimeSeries(:, 2)-0.1)./g)];%pitch
 %phiRaw = [treatedTimeSeries(:,1) asin((treatedTimeSeries(:, 3))./(-g*cos(thetaRaw(:,2))))];%roll
 phiRaw = [treatedTimeSeries(:,1) (atan(treatedTimeSeries(:, 3)+0.6979)./treatedTimeSeries(:, 4))] ;
 
@@ -71,7 +71,7 @@ sys = ss(A, [B G], C, [D H]);
 QpitchPitch = 0.0093; %retirado da experiencia C
 Qpitch = [QpitchPitch 0;
           0 0.2*QpitchPitch];
-Rpitch=20*QpitchPitch;
+Rpitch=1.25*QpitchPitch;
 [kalmfpitch,Lpitch,Ppitch]= kalman(sys,Qpitch,Rpitch);
 
 GyrosESTpitch= timeseries (treatedTimeSeries(:,6)*3.14/180, treatedTimeSeries(:,1));
@@ -81,10 +81,10 @@ Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 %ROLL
 QrollRoll = 0.0073; %retirado da experiencia C
 Qroll = [QrollRoll 0;
-         0 0.2*QrollRoll];
+         0 0.25*QrollRoll];
     
 %Qroll = 0.0750;
-Rroll = 20*QrollRoll;
+Rroll = 0.2*QrollRoll;
 [kalmfroll,Lroll,Proll]= kalman(sys,Qroll,Rroll);
 
 

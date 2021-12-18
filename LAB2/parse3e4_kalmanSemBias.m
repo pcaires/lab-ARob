@@ -12,7 +12,7 @@ treatedTimeSeries = [sensors.signal1.time(startPlot:endPlot) sensors.signal1.dat
 treatedTimeSeries(:,2:4) = treatedTimeSeries(:,2:4)/100; % conversão das acelerações para m/s^2 
 %Plot block
 figure(31)
-plot( treatedTimeSeries(:,1), treatedTimeSeries(: , 5:7) );
+plot( treatedTimeSeries(:,1), deg2rad(treatedTimeSeries(: , 5:7)) );
 legend('\omega_x','\omega_y','\omega_z') 
 title('Dados dos giroscópios')
 xlabel('tempo(s)')
@@ -70,7 +70,7 @@ Rpitch=2*Qpitch;
 N = 0;
 
 [kalmfpitch,Lpitch,P]= kalman(sys,Qpitch,Rpitch,N);
-GyrosESTpitch= timeseries (treatedTimeSeries(:,6)*3.14/180, treatedTimeSeries(:,1));
+GyrosESTpitch= timeseries (smooth(treatedTimeSeries(:,6)*3.14/180), treatedTimeSeries(:,1));
 Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 
 
@@ -82,7 +82,7 @@ Rroll = 2*Qroll;
 N = 0;
 
 [kalmfroll,Lroll,P]= kalman(sys,Qroll,Rroll,N);
-GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
+GyrosESTroll= timeseries (smooth(treatedTimeSeries(:,5)*3.14/180), treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
 
 Qconst = 0.01;
