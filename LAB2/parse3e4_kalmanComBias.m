@@ -1,14 +1,14 @@
 %Editar o ficheiro mat a carregar.
 clear
-load sensorsD.mat
+load sensorsD2.mat
 %-------------------------------------------------
-dT = sensors.signal1.time(2)-sensors.signal1.time(1);
-endTime = 25; %seconds
-startTime = 0.1; %seconds
+dT = sensors.time(2)-sensors.time(1);
+endTime = 20; %seconds
+startTime = 6; %seconds
 startPlot = round(startTime/dT);
 endPlot = round(endTime/dT);
 %treatedTimeSeries = [time ax ay az wx wy wz]
-treatedTimeSeries = [sensors.signal1.time(startPlot:endPlot) sensors.signal1.data(startPlot:endPlot,:) sensors.signal2.data(startPlot:endPlot,:)  ]; 
+treatedTimeSeries = [sensors.time(startPlot:endPlot) sensors.data(startPlot:endPlot,:)]; 
 treatedTimeSeries(:,2:4) = treatedTimeSeries(:,2:4)/100; % conversão das acelerações para m/s^2 
 %Plot block
 figure(31)
@@ -44,7 +44,10 @@ phiRaw = [treatedTimeSeries(:,1) (atan(treatedTimeSeries(:, 3)+0.6979)./treatedT
 
 %Plot block para 3.4
 figure(33)
-plot (thetaRaw(:,1), rad2deg(thetaRaw(:,2)), phiRaw(:,1), rad2deg(phiRaw(:,2)))
+plot (thetaRaw(:,1), rad2deg(thetaRaw(:,2)), pitch_roll.time, pitch_roll.data(:,1))
+legend('raw pitch (deg)','real roll (deg)') 
+figure(34)
+plot (phiRaw(:,1), rad2deg(phiRaw(:,2)), pitch_roll.time, pitch_roll.data(:,2))
 legend('raw pitch (deg)','raw roll (deg)') 
 %end plot block
 
@@ -96,3 +99,5 @@ Qtest = [Qconst 0;
          0   0.2*Qconst];
 Rtest = 2*Qconst;
 [kalmftest,Ltest,Ptest]= kalman(sys,Qtest,Rtest);
+
+out= sim('KalmanDados');

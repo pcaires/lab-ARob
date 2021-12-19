@@ -1,18 +1,18 @@
 %Editar o ficheiro mat a carregar.
 clear
-load sensorsC.mat
+load sensorsD2.mat
 %-------------------------------------------------
-dT = sensors.signal1.time(2)-sensors.signal1.time(1);
-endTime = 25; %seconds
-startTime = 0.1; %seconds
+dT = sensors.time(2)-sensors.time(1);
+endTime = 20; %seconds
+startTime = 8; %seconds
 startPlot = round(startTime/dT);
 endPlot = round(endTime/dT);
 %treatedTimeSeries = [time ax ay az wx wy wz]
-treatedTimeSeries = [sensors.signal1.time(startPlot:endPlot) sensors.signal1.data(startPlot:endPlot,:) sensors.signal2.data(startPlot:endPlot,:)  ]; 
+treatedTimeSeries = [sensors.time(startPlot:endPlot) sensors.data(startPlot:endPlot,:)]; 
 treatedTimeSeries(:,2:4) = treatedTimeSeries(:,2:4)/100; % conversão das acelerações para m/s^2 
 %Plot block
 figure(31)
-plot( treatedTimeSeries(:,1), treatedTimeSeries(: , 5:7) );
+plot( treatedTimeSeries(:,1), deg2rad(treatedTimeSeries(: , 5:7) ));
 legend('\omega_x','\omega_y','\omega_z') 
 title('Dados dos giroscópios')
 xlabel('tempo(s)')
@@ -38,26 +38,34 @@ CovarianceData1 = cov( treatedTimeSeries(:,2:7) );
 
 %pitch and roll from inclinometer data
 g = 9.81;%m/s^2
-thetaRaw  = [treatedTimeSeries(:,1)  asin((treatedTimeSeries(:, 2))./g)];%pitch
+thetaRaw  = [treatedTimeSeries(:,1)  asin((treatedTimeSeries(:, 2)-0.1)./g)];%pitch
 %phiRaw = [treatedTimeSeries(:,1) asin((treatedTimeSeries(:, 3))./(-g*cos(thetaRaw(:,2))))];%roll
 phiRaw = [treatedTimeSeries(:,1) (atan(treatedTimeSeries(:, 3)+0.6979)./treatedTimeSeries(:, 4))] ;
 
 %Plot block para 3.4
 figure(33)
 plot (thetaRaw(:,1), rad2deg(thetaRaw(:,2)), phiRaw(:,1), rad2deg(phiRaw(:,2)))
+legend('raw pitch (deg)','real roll (deg)') 
+figure(34)
+plot (phiRaw(:,1), rad2deg(phiRaw(:,2)))
 legend('raw pitch (deg)','raw roll (deg)') 
 %end plot block
 
 %KALMAN
 %State-space
-A=[-1 0; 0 0];
-B=[0;1];
+A=[0 -1
+   0 0];
+B=[1
+   0];
+C=[1 0];
 
-C=[1 1];
+D=[0];
 
-D= [0 0 0];
+H=[0 0];
 
-sys = ss(A, [B eye(2)], C, D);
+G=eye(2);
+
+sys = ss(A, [B G], C, [D H]);
 
 %Q -> inverso da credibilidade no giroscopio, R-> inverso da credibilidade no accelerómetro
 %PITCH
@@ -65,33 +73,31 @@ sys = ss(A, [B eye(2)], C, D);
 
 QpitchPitch = 0.0093; %retirado da experiencia C
 Qpitch = [QpitchPitch 0;
-          0 1000*QpitchPitch];
-
-Rpitch=200*QpitchPitch;
-
+          0 0.2*QpitchPitch];
+Rpitch=1.25*QpitchPitch;
 [kalmfpitch,Lpitch,Ppitch]= kalman(sys,Qpitch,Rpitch);
-kalmfpitch = kalmfpitch(1,:);
-sizeData = size(treatedTimeSeries(:,6),1);
-GyrosESTpitch= timeseries ([zeros(sizeData,1) treatedTimeSeries(:,6)*3.14/180], treatedTimeSeries(:,1));
+
+GyrosESTpitch= timeseries (treatedTimeSeries(:,6)*3.14/180, treatedTimeSeries(:,1));
 Accelpitch = timeseries (thetaRaw, treatedTimeSeries(:,1));
 
 
 %ROLL
 QrollRoll = 0.0073; %retirado da experiencia C
 Qroll = [QrollRoll 0;
-         0 1000*QrollRoll];
+         0 0.25*QrollRoll];
     
 %Qroll = 0.0750;
-Rroll = 5*QrollRoll;
-
-
+Rroll = 0.2*QrollRoll;
 [kalmfroll,Lroll,Proll]= kalman(sys,Qroll,Rroll);
-kalmfroll = kalmfroll(1,:);
-sizeData2 = size(treatedTimeSeries(:,5),1);
 
-GyrosESTroll= timeseries ([zeros(sizeData2,1) treatedTimeSeries(:,5)*3.14/180], treatedTimeSeries(:,1));
+
+GyrosESTroll= timeseries (treatedTimeSeries(:,5)*3.14/180, treatedTimeSeries(:,1));
 Accelroll = timeseries (phiRaw, treatedTimeSeries(:,1));
-Qconst = 2;
-QTest = [Qconst 0; 
-         0 200*Qconst];
-RTest = 0.1*Qconst;
+
+Qconst = 0.01;
+Qtest = [Qconst 0; 
+         0   0.2*Qconst];
+Rtest = 2*Qconst;
+[kalmftest,Ltest,Ptest]= kalman(sys,Qtest,Rtest);
+
+out= sim('KalmanDados');

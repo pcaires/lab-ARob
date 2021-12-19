@@ -13,7 +13,7 @@
 %%
 %  Cleaning workspace
 bdclose all;
-%clear all;
+clear all;
 bdclose all;
 clc
 
