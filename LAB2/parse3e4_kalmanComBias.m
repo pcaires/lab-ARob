@@ -1,6 +1,6 @@
 %Editar o ficheiro mat a carregar.
 clear
-load sensorsD2.mat
+load sensorsD.mat
 %-------------------------------------------------
 dT = sensors.time(2)-sensors.time(1);
 endTime = 22; %seconds
@@ -11,7 +11,7 @@ endPlot = round(endTime/dT);
 treatedTimeSeries = [sensors.time(startPlot:endPlot) sensors.data(startPlot:endPlot,:)]; 
 treatedTimeSeries(:,2:4) = treatedTimeSeries(:,2:4)/100; % conversão das acelerações para m/s^2
 treatedTimeSeries(:,5:7) = deg2rad(treatedTimeSeries(:,5:7));%conversao para radianos
-treatedTimeSeries(:,2) = treatedTimeSeries(:,2)+0.1754; 
+treatedTimeSeries(:,2) = treatedTimeSeries(:,2)+0.3253; 
 treatedTimeSeries(:,3) = treatedTimeSeries(:,3);%-0.1897; 
 %Plot block
 figure(31)
@@ -78,7 +78,7 @@ sys = ss(A, [B G], C, [D H]);
 QpitchPitch = 0.0055; %retirado da experiencia C
 Qpitch = [QpitchPitch 0;
           0 0.2*QpitchPitch];
-Rpitch=150*QpitchPitch;
+Rpitch=2*QpitchPitch;
 
 [kalmfpitch,Lpitch,P]= kalman(sys,Qpitch,Rpitch);
 GyrosESTpitch= timeseries (treatedTimeSeries(:,6), treatedTimeSeries(:,1));
@@ -107,12 +107,22 @@ out = sim('KalmanDados');
 
 figure(41)
 plot (out.phi.time, rad2deg(out.phi.data(:,1)), pitch_roll.time(startPlot:endPlot), pitch_roll.data(startPlot:endPlot,2))
-legend('Est roll (deg)','real roll (deg)') 
+legend('Estimado','Real')
+title('Rolamento')
+xlabel('Tempo(s)')
+ylabel('\phi (deg)')
 
 figure(42)
 plot (out.theta.time, rad2deg(out.theta.data(:,1)), pitch_roll.time(startPlot:endPlot), pitch_roll.data(startPlot:endPlot,1))
-legend('Est pitch (deg)','real pitch (deg)')
+legend('Estimado','Real')
+title('Picada')
+xlabel('Tempo(s)')
+ylabel('\theta (deg)')
 
 figure(43)
-plot(out.theta.time,rad2deg(out.theta.data(:,3)), out.phi.time,rad2deg(out.phi.data(:,3)))
-legend('Est pitch drift (deg)','Est roll drift (deg)')
+plot(out.theta.time, rad2deg(out.theta.data(:,3)))
+legend('Enviesamento estimado - b_y')
+
+figure(44)
+plot(out.phi.time,rad2deg(out.phi.data(:,3)))
+legend('Enviesamento estimado - b_x')
