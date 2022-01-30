@@ -3,9 +3,11 @@ a=1;
 A_yaw=[a 0; 
    1 0];
 B_yaw=[Kyaw 0]';
-Q_yaw=[1 0;
-   0 1];
-R_yaw=0.6;
+q1=0.5;
+q2=0.5;
+Q_yaw=[q1 0;
+       0 q2];
+R_yaw=1;
 
 [K_yaw, P_yaw, eigen_yaw] = lqr(A_yaw,B_yaw,Q_yaw,R_yaw);
 s = tf('s');
